@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = "http://13.233.95.122:/api";
 
 // Add car
 async function addCar() {
