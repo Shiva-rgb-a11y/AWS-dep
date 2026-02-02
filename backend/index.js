@@ -1,47 +1,47 @@
 require("dotenv").config();
-const Car = require("./models/Car");
-const carRoutes = require("./routes/carRoutes");
-const cors = require("cors");
+
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const path = require("path");
+
+const carRoutes = require("./routes/carRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
-app.use(cors()); 
+
+/* =========================
+   Middlewares
+========================= */
+app.use(cors());
 app.use(express.json());
 
 /* =========================
-   MongoDB Connection
+   MongoDB
 ========================= */
 mongoose
-  .connect(process.env.MONGO_URI, {
-    dbName: "car"
-  })
-  .then(() => {
-    console.log("MongoDB connected");
-  })
+  .connect(process.env.MONGO_URI, { dbName: "car" })
+  .then(() => console.log("MongoDB connected"))
   .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
+    console.error("MongoDB error:", err.message);
     process.exit(1);
   });
 
-mongoose.connection.once("open", () => {
-  console.log("Connected to DB:", mongoose.connection.name);
-});
-
 /* =========================
-   Routes
+   API Routes
 ========================= */
-app.get("/", (req, res) => {
-  res.send("Car backend running");
-});
-
 app.use("/api", carRoutes);
 
+// Serve frontend
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 
 /* =========================
-   Error Handler (ALWAYS LAST)
+   Error Handler
 ========================= */
 app.use(errorHandler);
 
